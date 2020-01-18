@@ -30,6 +30,9 @@ func Object(name string, children ...Type) object {
 }
 
 func (o object) String() string {
+	if len(o.children) == 0 {
+		return "{}"
+	}
 	s := printChildren(o.children, o.order)
 	return fmt.Sprintf("{\n%s\n}", indent(s))
 }

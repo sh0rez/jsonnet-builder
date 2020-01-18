@@ -89,3 +89,26 @@ func (r requiredArgType) String() string {
 func Required(t Type) requiredArgType {
 	return requiredArgType{t}
 }
+
+// CallChain allows to chain multiple calls
+func CallChain(name string, calls ...callType) callType {
+	if len(calls) == 1 {
+		panic("callChain with a single call is redundant")
+	}
+
+	var last Type = Ref("", "")
+	for i, c := range calls {
+		last = Call("",
+			strings.TrimPrefix(Field("", last, c.funcName).String(), "."),
+			c.args,
+		)
+
+		if i == len(calls)-1 {
+			l := last.(callType)
+			l.named = named(name)
+			return l
+		}
+	}
+
+	panic("loop did not return. This should never happen")
+}

@@ -30,7 +30,7 @@ func diff(t *testing.T, want, got string) {
 	buf := bytes.Buffer{}
 	want = filepath.Join(dir, "want")
 	got = filepath.Join(dir, "got")
-	cmd := exec.Command("bash", "-c", fmt.Sprintf("diff -u -N %s %s | colordiff", want, got))
+	cmd := exec.Command("bash", "-c", fmt.Sprintf("diff -u -N %s %s | cat -vet | colordiff", want, got))
 	cmd.Stderr = os.Stderr
 	cmd.Stdout = &buf
 	err = cmd.Run()

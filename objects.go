@@ -6,8 +6,8 @@ import (
 )
 
 const (
-	SeparatorLong    = "\n"
-	SeparatorConcise = " "
+	SeparatorLong    = ",\n"
+	SeparatorConcise = ", "
 )
 
 // Objects (dicts)
@@ -88,7 +88,7 @@ func printChildren(children map[string]Type, order []string, s string) string {
 			colon = "+:"
 		}
 
-		j += fmt.Sprintf("%s%s %s,"+s, name, colon, value)
+		j += fmt.Sprintf("%s%s %s"+s, name, colon, value)
 
 	}
 	j = strings.TrimSuffix(j, s)

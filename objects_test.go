@@ -9,7 +9,7 @@ func TestObjectPrimitive(t *testing.T) {
 {
   int: 1,
   string: "hello",
-  bool: true,
+  bool: true
 }
 `
 
@@ -28,9 +28,9 @@ func TestObjectFuncs(t *testing.T) {
   regular(s="string", b=false, i=3): {
     s: s,
     b: b,
-    i: i,
+    i: i
   },
-  hidden(h=3): h,
+  hidden(h=3): h
 }
 `
 
@@ -60,11 +60,11 @@ func TestObjectMerge(t *testing.T) {
 	want := `
 {
   regular+: {
-    int: 2,
+    int: 2
   },
   hidden+:: {
-    incognito: "yes!",
-  },
+    incognito: "yes!"
+  }
 }
 `
 
@@ -85,7 +85,7 @@ func TestObjectLocal(t *testing.T) {
 {
   local msg = "hello",
   greet: msg,
-  local sth = "else",
+  local sth = "else"
 }
 `
 

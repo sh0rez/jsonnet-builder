@@ -97,3 +97,12 @@ func TestObjectLocal(t *testing.T) {
 
 	assertRender(t, o, want)
 }
+
+func TestObjectConcise(t *testing.T) {
+	want := `{ s: "string", b: false }`
+	o := ConciseObject("",
+		String("s", "string"),
+		Bool("b", false),
+	)
+	assertRender(t, o, want)
+}

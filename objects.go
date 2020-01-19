@@ -64,30 +64,32 @@ func (o ObjectType) ConciseString() string {
 
 func printChildren(children map[string]Type, order []string, s string) string {
 	j := ""
-	for _, key := range order {
-		switch t := children[key].(type) {
-		case FuncType:
-			j += fmt.Sprintf("%s(%s): %s,"+s, t.Name(), t.Args(), t.String())
-		case HiddenType:
-			op := "::"
+	for _, k := range order {
+		c := children[k]
+		name := c.Name()
+		colon := ":"
+		value := c.String()
 
+		switch t := c.(type) {
+		case FuncType:
+			name = fmt.Sprintf("%s(%s)", t.Name(), t.Args())
+		case HiddenType:
+			colon = "::"
 			switch h := t.value.(type) {
 			case MergeType:
-				op = "+::"
+				colon = "+::"
 			case FuncType:
-				j += fmt.Sprintf("%s(%s)%s %s,"+s, t.Name(), h.Args(), op, t.String())
-				continue
+				name = fmt.Sprintf("%s(%s)", h.Name(), h.Args())
 			}
-
-			j += fmt.Sprintf("%s%s %s,"+s, t.Name(), op, t.String())
-
 		case LocalType:
-			j += fmt.Sprintf("local %s = %s,"+s, t.Name(), t.String())
+			colon = " ="
+			name = "local " + t.Name()
 		case MergeType:
-			j += fmt.Sprintf("%s+: %s,"+s, t.Name(), t.String())
-		default:
-			j += fmt.Sprintf("%s: %s,"+s, t.Name(), t.String())
+			colon = "+:"
 		}
+
+		j += fmt.Sprintf("%s%s %s,"+s, name, colon, value)
+
 	}
 	j = strings.TrimSuffix(j, s)
 	return j

@@ -43,7 +43,7 @@ func (c CallType) String() string {
 func Call(name, funcName string, args []Type) CallType {
 	for k, v := range args {
 		if v == nil {
-			panic(fmt.Sprintf("argument `%s` in call to `%s` is nil", k, funcName))
+			panic(fmt.Sprintf("argument `%v` in call to `%s` is nil", k, funcName))
 		}
 	}
 

@@ -1,4 +1,4 @@
-package main
+package builder
 
 import (
 	"fmt"
@@ -11,18 +11,18 @@ func (n named) Name() string {
 	return string(n)
 }
 
-type doc struct {
-	locals []localType
-	root   Type
+type Doc struct {
+	Locals []LocalType
+	Root   Type
 }
 
-func (d doc) String() string {
+func (d Doc) String() string {
 	s := ""
-	for _, l := range d.locals {
+	for _, l := range d.Locals {
 		s += fmt.Sprintf("local %s = %s;\n", l.Name(), l.String())
 	}
 
-	s += d.root.String()
+	s += d.Root.String()
 	return s
 }
 
@@ -31,26 +31,26 @@ type Type interface {
 	Name() string
 }
 
-func main() {
-	o := Object("",
-		Hidden(Object("deployment",
-			Func("new",
-				Args(Required(String("name", "")), Int("retain", 3)),
-				Object("", Ref("name", "name")),
-			),
-		)),
-		Call("deploy", "$.deployment.new", Args(String("name", "hi"))),
-	)
+// func main() {
+// 	o := Object("",
+// 		Hidden(Object("deployment",
+// 			Func("new",
+// 				Args(Required(String("name", "")), Int("retain", 3)),
+// 				Object("", Ref("name", "name")),
+// 			),
+// 		)),
+// 		Call("deploy", "$.deployment.new", Args(String("name", "hi"))),
+// 	)
 
-	d := doc{
-		root: o,
-		locals: []localType{
-			Local(String("nice", "ho")),
-		},
-	}
+// 	d := Doc{
+// 		Root: o,
+// 		Locals: []localType{
+// 			Local(String("nice", "ho")),
+// 		},
+// 	}
 
-	fmt.Println(d.String())
-}
+// 	fmt.Println(d.String())
+// }
 
 func indent(s string) string {
 	split := strings.Split(s, "\n")

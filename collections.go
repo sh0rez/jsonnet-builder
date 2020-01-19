@@ -1,4 +1,4 @@
-package main
+package builder
 
 import (
 	"fmt"
@@ -6,13 +6,13 @@ import (
 )
 
 // Objects (dicts)
-type object struct {
+type ObjectType struct {
 	named
 	order    []string
 	children map[string]Type
 }
 
-func Object(name string, children ...Type) object {
+func Object(name string, children ...Type) ObjectType {
 	c := make(map[string]Type)
 	order := make([]string, len(children))
 	i := 0
@@ -26,10 +26,10 @@ func Object(name string, children ...Type) object {
 		i++
 	}
 
-	return object{named: named(name), children: c, order: order}
+	return ObjectType{named: named(name), children: c, order: order}
 }
 
-func (o object) String() string {
+func (o ObjectType) String() string {
 	if len(o.children) == 0 {
 		return "{}"
 	}
@@ -41,24 +41,24 @@ func printChildren(children map[string]Type, order []string) string {
 	s := ""
 	for _, key := range order {
 		switch t := children[key].(type) {
-		case funcType:
+		case FuncType:
 			s += fmt.Sprintf("%s(%s): %s,\n", t.Name(), t.Args(), t.String())
-		case hiddenType:
+		case HiddenType:
 			op := "::"
 
 			switch h := t.value.(type) {
-			case mergeType:
+			case MergeType:
 				op = "+::"
-			case funcType:
+			case FuncType:
 				s += fmt.Sprintf("%s(%s)%s %s,\n", t.Name(), h.Args(), op, t.String())
 				continue
 			}
 
 			s += fmt.Sprintf("%s%s %s,\n", t.Name(), op, t.String())
 
-		case localType:
+		case LocalType:
 			s += fmt.Sprintf("local %s = %s,\n", t.Name(), t.String())
-		case mergeType:
+		case MergeType:
 			s += fmt.Sprintf("%s+: %s,\n", t.Name(), t.String())
 		default:
 			s += fmt.Sprintf("%s: %s,\n", t.Name(), t.String())
@@ -69,16 +69,16 @@ func printChildren(children map[string]Type, order []string) string {
 }
 
 // Lists (arrays)
-type listType struct {
+type ListType struct {
 	named
 	items []Type
 }
 
-func List(name string, items ...Type) listType {
-	return listType{named: named(name), items: items}
+func List(name string, items ...Type) ListType {
+	return ListType{named: named(name), items: items}
 }
 
-func (t listType) String() string {
+func (t ListType) String() string {
 	s := ""
 	for _, l := range t.items {
 		s += fmt.Sprintf(", %s", l.String())

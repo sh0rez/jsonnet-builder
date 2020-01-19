@@ -1,17 +1,17 @@
-package main
+package builder
 
-type localType struct {
+type LocalType struct {
 	value Type
 }
 
-func Local(value Type) localType {
-	return localType{value}
+func Local(value Type) LocalType {
+	return LocalType{value}
 }
 
-func (t localType) String() string {
+func (t LocalType) String() string {
 	return t.value.String()
 }
 
-func (t localType) Name() string {
+func (t LocalType) Name() string {
 	return t.value.Name()
 }

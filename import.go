@@ -1,14 +1,14 @@
-package main
+package builder
 
 import "fmt"
 
-type importType struct {
+type ImportType struct {
 	named
 	pkg string
 	raw bool
 }
 
-func (i importType) String() string {
+func (i ImportType) String() string {
 	op := "import"
 	if i.raw {
 		op += "str"
@@ -17,10 +17,10 @@ func (i importType) String() string {
 	return fmt.Sprintf(`(%s "%s")`, op, i.pkg)
 }
 
-func Import(name, pkg string) importType {
-	return importType{named: named(name), pkg: pkg, raw: false}
+func Import(name, pkg string) ImportType {
+	return ImportType{named: named(name), pkg: pkg, raw: false}
 }
 
-func ImportStr(name, pkg string) importType {
-	return importType{named: named(name), pkg: pkg, raw: true}
+func ImportStr(name, pkg string) ImportType {
+	return ImportType{named: named(name), pkg: pkg, raw: true}
 }

@@ -1,4 +1,4 @@
-package main
+package builder
 
 import (
 	"fmt"
@@ -6,47 +6,48 @@ import (
 )
 
 // function definition
-type funcType struct {
+type FuncType struct {
 	named
 	args  []Type
 	value Type
 }
 
-func Func(name string, args []Type, returns Type) funcType {
-	return funcType{
+func Func(name string, args []Type, returns Type) FuncType {
+	return FuncType{
 		named: named(name),
 		args:  args,
 		value: returns,
 	}
 }
 
-func (f funcType) Args() string {
-	return argsString(f.args)
+func (f FuncType) Args() string {
+	return argsString(f.args, len(f.args) > 3)
 }
 
-func (f funcType) String() string {
+func (f FuncType) String() string {
 	return f.value.String()
 }
 
 // function call
-type callType struct {
+type CallType struct {
 	named
 	funcName string
 	args     []Type
 }
 
-func (c callType) String() string {
-	return fmt.Sprintf("%s(%s)", c.funcName, argsString(c.args))
+func (c CallType) String() string {
+	args := argsString(c.args, len(c.args) > 3)
+	return fmt.Sprintf("%s(%s)", c.funcName, args)
 }
 
-func Call(name, funcName string, args []Type) callType {
+func Call(name, funcName string, args []Type) CallType {
 	for k, v := range args {
 		if v == nil {
 			panic(fmt.Sprintf("argument `%s` in call to `%s` is nil", k, funcName))
 		}
 	}
 
-	return callType{
+	return CallType{
 		named:    named(name),
 		funcName: funcName,
 		args:     args,
@@ -58,53 +59,65 @@ func Args(args ...Type) []Type {
 	return args
 }
 
-func argsString(m []Type) string {
+func argsString(m []Type, breakLine bool) string {
 	s := ""
 	for _, v := range m {
-		if _, ok := v.(requiredArgType); ok {
-			s += fmt.Sprintf(", %s", v.Name())
-			continue
+		if _, ok := v.(RequiredArgType); ok {
+			s += fmt.Sprintf("%s, ", v.Name())
+		} else {
+			s += fmt.Sprintf("%s=%s, ", v.Name(), v.String())
 		}
 
-		s += fmt.Sprintf(", %s=%s", v.Name(), v.String())
+		if breakLine {
+			s += "\n  "
+		}
 	}
 
-	s = strings.TrimPrefix(s, ", ")
+	s = strings.TrimSuffix(s, "  ")
+	s = strings.TrimSuffix(s, ", ")
 	return s
 }
 
-type requiredArgType struct {
+type RequiredArgType struct {
 	value Type
 }
 
-func (r requiredArgType) Name() string {
+func (r RequiredArgType) Name() string {
 	return r.value.Name()
 }
 
-func (r requiredArgType) String() string {
+func (r RequiredArgType) String() string {
 	return r.value.String()
 }
 
 // mark an argument as required (no default value)
-func Required(t Type) requiredArgType {
-	return requiredArgType{t}
+func Required(t Type) RequiredArgType {
+	return RequiredArgType{t}
 }
 
 // CallChain allows to chain multiple calls
-func CallChain(name string, calls ...callType) callType {
+func CallChain(name string, calls ...CallType) CallType {
 	if len(calls) == 1 {
 		panic("callChain with a single call is redundant")
+	}
+
+	ln := ""
+	if len(calls) > 1 {
+		ln = "\n"
 	}
 
 	var last Type = Ref("", "")
 	for i, c := range calls {
 		last = Call("",
-			strings.TrimPrefix(Field("", last, c.funcName).String(), "."),
+			strings.TrimPrefix(
+				fmt.Sprintf("%s%s.%s", last.String(), ln, c.funcName),
+				ln+".",
+			),
 			c.args,
 		)
 
 		if i == len(calls)-1 {
-			l := last.(callType)
+			l := last.(CallType)
 			l.named = named(name)
 			return l
 		}

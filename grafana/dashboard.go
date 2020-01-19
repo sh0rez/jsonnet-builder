@@ -134,5 +134,10 @@ type GridPos struct {
 }
 
 func (g GridPos) Jsonnet(name string) j.Type {
-	return j.Marshal(name, g)
+	return j.ConciseObject(name,
+		j.Int("h", g.H),
+		j.Int("w", g.W),
+		j.Int("x", g.X),
+		j.Int("y", g.Y),
+	)
 }
